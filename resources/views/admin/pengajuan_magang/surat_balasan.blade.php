@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Surat Balasan Magang</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; padding: 20px; }
+        .kop-table { width: 100%; border-bottom: 3px double #000; margin-bottom: 20px; }
+        .kop-table td { border: none; padding: 5px; }
+        .logo-bps { width: 90px; }
+        .kop-text { text-align: left; }
+        .kop-title { font-size: 16px; font-weight: bold; text-transform: uppercase; }
+        .kop-sub { font-size: 14px; font-weight: bold; text-transform: uppercase; }
+        .kop-address { font-size: 10px; font-style: italic; }
+        
+        table.content-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        table.content-table td { vertical-align: top; padding: 2px; }
+        
+        /* Update CSS TTD Box agar posisi tanggal pas */
+        .ttd-box { float: right; width: 300px; margin-top: 40px; text-align: left; }
+        
+        /* Footer BSrE */
+        .bsre-footer {
+            clear: both;
+            margin-top: 50px;
+            font-size: 10pt;
+            color: #555;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            text-align: center;
+            font-style: italic;
+            position: fixed; 
+            bottom: 0;
+            left: 0; 
+            right: 0;
+        }
+
+        @media print {
+            .bsre-footer {
+                position: fixed;
+                bottom: 0px;
+            }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+    <table class="kop-table">
+        <tr>
+            <td width="100" align="center">
+                <?php
+                // Convert gambar ke base64 agar tampil di PDF/Print
+                $path = public_path('assets/img/logo.png');
+                if (file_exists($path)) {
+                    $type = pathinfo($path, PATHINFO_EXTENSION);
+                    $data = file_get_contents($path);
+                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    echo '<img src="' . $base64 . '" class="logo-bps">';
+                } else {
+                    echo '<img src="' . asset('assets/img/logo.png') . '" class="logo-bps">';
+                }
+                ?>
+            </td>
+            <td class="kop-text">
+                <span class="kop-title">BADAN PUSAT STATISTIK</span><br>
+                <span class="kop-sub">PROVINSI BANTEN</span><br>
+                <span class="kop-address">
+                    Jl. Syeh Nawawi Al Bantani, Kawasan Pusat Pemerintahan Provinsi Banten (KP3B), Kav. H1-2 Serang Banten.<br>
+                    Telp: (0254) 267027. Email: bps3600@bps.go.id, Website: http://banten.bps.go.id
+                </span>
+            </td>
+        </tr>
+    </table>
+
+    <table class="content-table" style="margin-bottom: 20px;">
+        <tr>
+            <td width="80">Nomor</td>
+            <td width="10">:</td>
+            <td>B-<?= rand(1000,9999) ?>/36000/HM.340/<?= date('Y') ?></td>
+        </tr>
+        <tr>
+            <td>Sifat</td>
+            <td>:</td>
+            <td>Biasa</td>
+        </tr>
+        <tr>
+            <td>Lampiran</td>
+            <td>:</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Hal</td>
+            <td>:</td>
+            <td><?= ($pengajuan->status_pengajuan == 'Diterima') ? 'Penerimaan KKP Mahasiswa' : 'Informasi Hasil Seleksi Magang' ?></td>
+        </tr>
+    </table>
+
+    <p>
+        Yth. Dekan/Ketua/Kepala Sekolah <?= $pengajuan->nama_sekolah ?><br>
+        di<br>
+        Tempat
+    </p>
+
+    <p style="text-align: justify;">
+        Menindaklanjuti pengajuan magang tanggal <?= date('d F Y', strtotime($pengajuan->created_at)) ?>
+        tentang Permohonan Izin KKP (Kuliah Kerja Praktik) / Magang mahasiswa sebagai berikut :
+    </p>
+
+    <table class="content-table" style="margin-left: 20px; width: 90%;">
+        <tr>
+            <td width="150">Nama</td>
+            <td width="10">:</td>
+            <td><b><?= $pengajuan->user->name ?? '-' ?></b></td>
+        </tr>
+        <tr>
+            <td>NIM / NIS</td>
+            <td>:</td>
+            <td><?= $pengajuan->nim_nisn ?></td>
+        </tr>
+        <tr>
+            <td>Jurusan / Prodi</td>
+            <td>:</td>
+            <td><?= $pengajuan->jurusan ?> (<?= $pengajuan->jenjang_pendidikan ?>)</td>
+        </tr>
+    </table>
+
+    <?php if($pengajuan->status_pengajuan == 'Diterima'): ?>
+        <p style="text-align: justify;">
+            Bersama ini disampaikan pada prinsipnya kami mahasiswa tersebut <b>Diterima</b> 
+            untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik
+            Provinsi Banten mulai tanggal <?= date('d F Y', strtotime($pengajuan->periode_mulai)) ?> s.d <?= date('d F Y', strtotime($pengajuan->periode_selesai)) ?>.
+        </p>
+    <?php else: ?>
+        <p style="text-align: justify;">
+            Bersama ini disampaikan bahwa berdasarkan hasil seleksi berkas dan ketersediaan kuota, <b>dengan berat hati pengajuan magang Ditolak</b> 
+            untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik Provinsi Banten untuk periode yang diajukan.
+        </p>
+    <?php endif; ?>
+
+    <p>
+        Demikian disampaikan, atas perhatian dan kerjasamanya diucapkan terimakasih.
+    </p>
+
+    <div class="ttd-box">
+        Serang, <?= date('d F Y') ?>
+        <br>
+        Kepala BPS Provinsi Banten,
+        <br><br><br><br><br>
+        <b>Nama Kepala BPS Provinsi Banten</b>
+    </div>
+
+    <div class="bsre-footer">
+        Dokumen ini telah ditanda tangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan oleh Balai Besar Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara (BSSN).
+    </div>
+
+</body>
+</html>
