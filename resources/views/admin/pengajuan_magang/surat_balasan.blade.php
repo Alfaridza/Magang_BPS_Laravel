@@ -108,7 +108,7 @@
         <tr>
             <td width="150">Nama</td>
             <td width="10">:</td>
-            <td><b><?= $pengajuan->user->name ?? '-' ?></b></td>
+            <td><b><?= $pengajuan->nama_lengkap ?? ($pengajuan->user->name ?? '-') ?></b></td>
         </tr>
         <tr>
             <td>NIM / NIS</td>

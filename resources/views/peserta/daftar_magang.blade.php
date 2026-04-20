@@ -110,6 +110,12 @@
                                 </select>
                             </div>
 
+                            <!-- Nama Lengkap-->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
+                                <input type="text" name="nama_lengkap" id="nama_lengkap" value="{{ old('nama_lengkap') }}" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white bgcheck-1">
+                            </div>
+
                             <!-- Jenis Magang -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Magang</label>
@@ -274,6 +280,10 @@
                         </div>
                         
                         <div>
+                            <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Nama Lengkap</p>
+                            <p id="detail-nama-lengkap" class="font-medium text-gray-800 mt-1"></p>
+                        </div>
+                        <div>
                             <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Status Peserta</p>
                             <p id="detail-status-peserta" class="font-medium text-gray-800 mt-1"></p>
                         </div>
@@ -358,6 +368,7 @@
     // Open detail modal and populate data
     function openDetailModal(magang) {
         // Populate standard text fields
+        document.getElementById('detail-nama-lengkap').innerText = magang.nama_lengkap || '-';
         document.getElementById('detail-status-peserta').innerText = magang.status_peserta || '-';
         document.getElementById('detail-nim').innerText = magang.nim_nisn || '-';
         document.getElementById('detail-instansi').innerText = magang.nama_sekolah || '-';

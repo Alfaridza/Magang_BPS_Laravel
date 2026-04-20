@@ -8,6 +8,7 @@ class PengajuanMagang extends Model
 {
     protected $fillable = [
         'user_id',
+        'nama_lengkap',
         'status_peserta',
         'jenis_magang',
         'nim_nisn',

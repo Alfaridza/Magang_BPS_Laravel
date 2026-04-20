@@ -12,6 +12,7 @@ class PengajuanMagangController extends Controller
     {
         $validated = $request->validate([
             'status_peserta' => 'required|in:Mahasiswa,Fresh graduated,Siswa',
+            'nama_lengkap' => 'required|string|max:255',
             'jenis_magang' => 'required|in:Magang Wajib/PKL,Magang Mandiri',
             'nim_nisn' => 'required|string|max:50',
             'jenjang_pendidikan' => 'required|in:SMK/SMA,Diploma,D4/S1',

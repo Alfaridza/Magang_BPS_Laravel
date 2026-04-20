@@ -34,7 +34,7 @@
                         <td class="py-3 px-4">
                             @if($magang->user)
                                 <button onclick='openDetailModal(@json($magang))' class="font-bold text-gray-800 text-left hover:text-blue-600 transition focus:outline-none" title="Lihat Detail Peserta">
-                                    {{ $magang->user->name }}
+                                    {{ $magang->nama_lengkap ?? $magang->user->name }}
                                 </button>
                             @else
                                 <div class="font-bold text-gray-800">User terhapus</div>
@@ -262,7 +262,7 @@
     function openDetailModal(magang) {
         // Data Registrasi (User)
         if (magang.user) {
-            document.getElementById('admin-detail-nama').innerText = magang.user.name || '-';
+            document.getElementById('admin-detail-nama').innerText = magang.nama_lengkap || magang.user.name || '-';
             document.getElementById('admin-detail-email').innerText = magang.user.email || '-';
             document.getElementById('admin-detail-hp').innerText = magang.user.no_hp || '-';
             document.getElementById('admin-detail-jk').innerText = magang.user.jenis_kelamin || '-';
