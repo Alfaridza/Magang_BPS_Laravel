@@ -32,6 +32,11 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/manajemen-peserta', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'index'])->name('manajemen_peserta.index');
+        Route::get('/manajemen-peserta/{id}', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'show'])->name('manajemen_peserta.show');
+        Route::get('/manajemen-peserta/{id}/edit', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'edit'])->name('manajemen_peserta.edit');
+        Route::put('/manajemen-peserta/{id}', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'update'])->name('manajemen_peserta.update');
+        Route::delete('/manajemen-peserta/{id}', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'destroy'])->name('manajemen_peserta.destroy');
         Route::get('/pengajuan-magang', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'index'])->name('pengajuan_magang.index');
         Route::post('/pengajuan-magang/{id}/terima', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'terima'])->name('pengajuan_magang.terima');
         Route::post('/pengajuan-magang/{id}/tolak', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'tolak'])->name('pengajuan_magang.tolak');

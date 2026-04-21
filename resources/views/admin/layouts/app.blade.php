@@ -60,6 +60,11 @@
                     <span class="ml-2 w-full">Manajemen Admin</span>
                 </a>
 
+                <a href="{{ url('admin/manajemen-peserta') }}" class="flex items-center px-4 py-2.5 text-sm {{ request()->is('admin/manajemen-peserta') ? 'sidebar-link-active' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors' }}">
+                    <i class="fas fa-users w-6 text-center"></i>
+                    <span class="ml-2 w-full">Manajemen Peserta</span>
+                </a>
+
                 <!-- Divider for Approval Data -->
                 <div class="px-4 py-2 mt-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Approval
