@@ -40,7 +40,7 @@
 
             <!-- User Info -->
             <div class="p-4 border-b border-gray-700">
-                <div class="text-sm font-semibold font-bold">Admin</div>
+                <div class="text-sm font-semibold font-bold">{{ Auth::guard('admin')->user() ? Auth::guard('admin')->user()->name : 'Admin' }}</div>
             </div>
 
             <!-- Navigation -->
@@ -92,7 +92,7 @@
 
                 <!-- Right Top bar (Logout) -->
                 <div class="flex items-center">
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form action="{{ route('admin.logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="flex items-center text-red-600 hover:text-red-800 font-semibold px-3 py-2 rounded-md hover:bg-red-50 transition">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout

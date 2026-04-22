@@ -12,16 +12,12 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::updateOrCreate(
+        \App\Models\Admin::updateOrCreate(
             ['email' => 'admin@bps.go.id'],
             [
                 'name' => 'Administrator BPS',
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'jenis_kelamin' => 'L',
-                'tanggal_lahir' => '1990-01-01',
                 'no_hp' => '081234567890',
-                'alamat' => 'Kantor BPS Provinsi Banten',
-                'role' => 'admin',
             ]
         );
     }

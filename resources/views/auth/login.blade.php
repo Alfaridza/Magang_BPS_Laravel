@@ -123,6 +123,10 @@
                     <div class="mt-8 text-center md:hidden">
                         <p class="text-gray-600 text-sm">Belum punya akun? <a href="{{ url('auth/register') }}" class="text-bps-light font-bold hover:underline">Daftar</a></p>
                     </div>
+
+                    <div class="mt-6 text-center">
+                        <a href="{{ route('admin.login') }}" class="text-gray-400 text-xs hover:text-gray-600 transition"><i class="fas fa-user-shield mr-1"></i> Area Administrator</a>
+                    </div>
                 </div>
             </div>
         </div>

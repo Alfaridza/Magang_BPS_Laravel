@@ -12,8 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Menghitung hanya user yang bukan admin (atau secara khusus hanya yang memiliki role peserta)
-        $total_pendaftar = User::where('role', '!=', 'admin')->count();
+        $total_pendaftar = User::count();
         $perlu_verifikasi = PengajuanMagang::where('status_pengajuan', 'Menunggu')->count();
         
         $today = Carbon::today();

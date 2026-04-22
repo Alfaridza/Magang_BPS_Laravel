@@ -13,8 +13,7 @@ class ManajemenPesertaController extends Controller
     {
         $search = $request->input('search');
         
-        $pesertas = User::where('role', '!=', 'admin')
-                        ->orWhereNull('role');
+        $pesertas = User::query();
         
         if ($search) {
             $pesertas = $pesertas->where(function($query) use ($search) {
@@ -75,10 +74,7 @@ class ManajemenPesertaController extends Controller
     {
         $user = User::findOrFail($id);
         
-        // Check if user is admin
-        if ($user->role === 'admin') {
-            return redirect()->back()->with('error', 'Tidak dapat menghapus admin.');
-        }
+        // 
         
         // Delete related pengajuan magang records first
         $user->pengajuanMagangs()->delete();
