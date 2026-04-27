@@ -22,6 +22,7 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-100 flex flex-col min-h-screen">
 
     <div class="flex flex-1 overflow-hidden">
@@ -74,6 +75,11 @@
                     <i class="fas fa-file-signature w-6 text-center"></i>
                     <span class="ml-2 w-full">Pengajuan Magang</span>
                 </a>
+
+                <a href="{{ url('admin/log-aktivitas') }}" class="flex items-center px-4 py-2.5 text-sm {{ request()->is('admin/log-aktivitas*') ? 'sidebar-link-active' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors' }}">
+                    <i class="fas fa-clipboard-list w-6 text-center"></i>
+                    <span class="ml-2 w-full">Log Aktivitas</span>
+                </a>
             </nav>
         </aside>
 
@@ -90,14 +96,29 @@
                     <!-- <h2 class="ml-4 text-xl font-semibold text-gray-800 hidden sm:block">@yield('header', 'Dashboard')</h2> -->
                 </div>
 
-                <!-- Right Top bar (Logout) -->
+                <!-- Right Top bar (Admin profile dropdown) -->
                 <div class="flex items-center">
-                    <form action="{{ route('admin.logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="flex items-center text-red-600 hover:text-red-800 font-semibold px-3 py-2 rounded-md hover:bg-red-50 transition">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    <div class="relative" id="admin-user-menu-container">
+                        <button id="admin-user-menu-button" class="flex items-center text-gray-700 hover:text-gray-900 font-semibold px-3 py-2 rounded-md hover:bg-gray-100 transition focus:outline-none">
+                            <img src="{{ 'https://ui-avatars.com/api/?name='.urlencode(Auth::guard('admin')->user() ? Auth::guard('admin')->user()->name : 'Admin').'&background=1e293b&color=fff&size=128' }}" alt="Avatar" class="w-8 h-8 rounded-full mr-2 object-cover">
+                            <span class="hidden sm:inline">{{ Auth::guard('admin')->user() ? Auth::guard('admin')->user()->name : 'Admin' }}</span>
+                            <i class="fas fa-caret-down ml-2 text-gray-500"></i>
                         </button>
-                    </form>
+
+                        <div id="admin-user-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
+                            <div class="flex items-center px-4 py-2 text-sm text-gray-700">
+                                <i class="fas fa-envelope mr-2"></i>
+                                {{ Auth::guard('admin')->user() ? Auth::guard('admin')->user()->email : 'admin@local' }}
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -116,6 +137,39 @@
             </footer>
         </div>
     </div>
+
+    <!-- Global Modal Overlay -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div id="modal-window" class="bg-white rounded shadow-lg w-full max-w-2xl mx-4 overflow-auto relative">
+            <button id="modal-close" class="absolute top-6 right-6 text-gray-600 hover:text-gray-800 text-2xl leading-none bg-white rounded-full p-2 shadow">&times;</button>
+            <div id="modal-content" class="p-4 pt-6"></div>
+        </div>
+    </div>
     
+    <script src="{{ asset('js/admin-modal.js') }}" defer></script>
+    <script src="{{ asset('js/auto-flash-close.js') }}" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            var btn = document.getElementById('admin-user-menu-button');
+            var menu = document.getElementById('admin-user-menu-dropdown');
+
+            if (!btn || !menu) return;
+
+            document.addEventListener('click', function(e){
+                if (btn.contains(e.target)) {
+                    menu.classList.toggle('hidden');
+                } else {
+                    if (!menu.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                }
+            });
+
+            document.addEventListener('keydown', function(e){
+                if (e.key === 'Escape') menu.classList.add('hidden');
+            });
+        });
+    </script>
 </body>
 </html>

@@ -23,8 +23,11 @@
         </div>
 
         @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm" role="alert">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm flash-message" role="alert">
                 <span class="block sm:inline">{{ $errors->first() }}</span>
+                <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+                    <i class="fas fa-times text-red-700 hover:text-red-900"></i>
+                </button>
             </div>
         @endif
 

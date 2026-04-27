@@ -6,23 +6,29 @@
     <h1 class="text-2xl font-normal text-gray-800 mb-6 font-sans">Manajemen Admin</h1>
 
     @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 flash-message" role="alert">
             <span class="block sm:inline">{{ session('success') }}</span>
+            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+                <i class="fas fa-times text-green-700 hover:text-green-900"></i>
+            </button>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 flash-message" role="alert">
             <span class="block sm:inline">{{ session('error') }}</span>
+            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+                <i class="fas fa-times text-red-700 hover:text-red-900"></i>
+            </button>
         </div>
     @endif
 
     <div class="bg-white rounded border border-gray-200 shadow-sm p-6 text-gray-700">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-lg font-bold">Daftar Admin Sistem</h2>
-            <a href="{{ route('admin.manajemen_admin.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow flex items-center transition">
+            <button class="open-modal bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow flex items-center transition" data-url="{{ route('admin.manajemen_admin.create') }}">
                 <i class="fas fa-plus mr-2"></i> Tambah Admin
-            </a>
+            </button>
         </div>
         
         <form action="{{ route('admin.manajemen_admin.index') }}" method="GET" class="mb-4 flex">
@@ -47,9 +53,9 @@
                         <td class="py-3 px-4">{{ $admin->email }}</td>
                         <td class="py-3 px-4">{{ $admin->no_hp ?? '-' }}</td>
                         <td class="py-3 px-4 text-center">
-                            <a href="{{ route('admin.manajemen_admin.edit', $admin->id) }}" class="text-blue-500 hover:text-blue-700 mr-3" title="Edit">
+                            <button class="open-modal text-blue-500 hover:text-blue-700 mr-3" title="Edit" data-url="{{ route('admin.manajemen_admin.edit', $admin->id) }}">
                                 <i class="fas fa-edit"></i>
-                            </a>
+                            </button>
                             <form action="{{ route('admin.manajemen_admin.destroy', $admin->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus admin ini?');">
                                 @csrf
                                 @method('DELETE')

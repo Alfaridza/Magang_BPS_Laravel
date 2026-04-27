@@ -59,6 +59,11 @@
                                 <span class="bg-green-100 text-green-800 py-1 px-3 rounded-full text-xs font-semibold">Diterima</span>
                             @else
                                 <span class="bg-red-100 text-red-800 py-1 px-3 rounded-full text-xs font-semibold">Ditolak</span>
+                                @if($magang->alasan_penolakan)
+                                    <div class="mt-1 text-[10px] text-red-500 italic font-medium max-w-[120px] mx-auto truncate" title="{{ $magang->alasan_penolakan }}">
+                                        Ket: {{ $magang->alasan_penolakan }}
+                                    </div>
+                                @endif
                             @endif
                         </td>
                         <td class="py-3 px-4 text-center">
@@ -190,6 +195,12 @@
                                 <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-1">Tema Magang Diusulkan</p>
                                 <p id="admin-detail-tema" class="font-medium text-gray-800 mt-1 bg-gray-50 p-2 rounded-lg border border-gray-100 italic"></p>
                             </div>
+
+                            <!-- Alasan Penolakan (Hidden by default, shown if rejected) -->
+                            <div id="admin-detail-rejection-section" class="hidden">
+                                <p class="text-xs text-red-500 font-semibold uppercase tracking-wider mt-3">Alasan Penolakan</p>
+                                <p id="admin-detail-alasan" class="font-medium text-red-700 mt-1 bg-red-50 p-3 rounded-lg border border-red-100 text-sm"></p>
+                            </div>
                             
                             <!-- Download Berkas -->
                             <div class="flex space-x-3 mt-4 pt-3 border-t border-gray-100">
@@ -220,12 +231,9 @@
                                 <i class="fas fa-check mr-2 mt-0.5"></i> Terima Peserta
                             </button>
                         </form>
-                        <form id="form-tolak" method="POST" onsubmit="return confirm('Apakah Anda yakin menolak pengajuan ini?');">
-                            @csrf
-                            <button type="submit" class="inline-flex justify-center rounded-xl border border-transparent shadow-sm px-5 py-2 bg-red-500 text-sm font-bold text-white hover:bg-red-600 focus:outline-none transition">
-                                <i class="fas fa-times mr-2 mt-0.5"></i> Tolak
-                            </button>
-                        </form>
+                        <button type="button" onclick="openRejectModal()" class="inline-flex justify-center rounded-xl border border-transparent shadow-sm px-5 py-2 bg-red-500 text-sm font-bold text-white hover:bg-red-600 focus:outline-none transition">
+                            <i class="fas fa-times mr-2 mt-0.5"></i> Tolak
+                        </button>
                     </div>
                     <a id="admin-btn-cetak" target="_blank" class="hidden inline-flex justify-center rounded-xl border border-transparent shadow-sm px-5 py-2 bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-700 focus:outline-none transition">
                         <i class="fas fa-print mr-2 mt-0.5"></i> Cetak Surat Balasan
@@ -240,15 +248,64 @@
     </div>
 </div>
 
+<!-- Modal Alasan Penolakan -->
+<div id="modal-reject" class="fixed inset-0 z-[110] hidden overflow-y-auto" aria-labelledby="modal-title-reject" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-60 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="toggleModal('modal-reject')"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-gray-100">
+            <div class="bg-red-600 px-6 py-4 border-b border-red-700 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white flex items-center" id="modal-title-reject">
+                    <i class="fas fa-exclamation-triangle mr-3"></i> Alasan Penolakan
+                </h3>
+                <button type="button" class="text-white hover:text-gray-200" onclick="toggleModal('modal-reject')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="form-reject-confirm" method="POST">
+                @csrf
+                <div class="bg-white px-6 py-6">
+                    <p class="text-sm text-gray-600 mb-4">Berikan alasan mengapa pengajuan ini ditolak. Informasi ini akan membantu peserta memahami kekurangan mereka.</p>
+                    <div>
+                        <label for="alasan_penolakan" class="block text-sm font-bold text-gray-700 mb-2">Keterangan Alasan <span class="text-red-500">*</span></label>
+                        <textarea name="alasan_penolakan" id="alasan_penolakan" rows="4" required 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-red-500/10 focus:border-red-500 outline-none transition-all bg-gray-50/30 focus:bg-white font-medium text-sm"
+                            placeholder="Misal: Kuota penuh, Berkas tidak sesuai, dll..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                    <button type="button" class="px-5 py-2 rounded-xl font-bold text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all" onclick="toggleModal('modal-reject')">
+                        Batal
+                    </button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-red-500/20 transition-all transform hover:-translate-y-0.5">
+                        Konfirmasi Tolak
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    let currentMagangId = null;
+
     function toggleModal(modalID) {
         let el = document.getElementById(modalID);
         if (el.classList.contains('hidden')) {
             el.classList.remove('hidden');
-            el.querySelector('.transform').classList.add('scale-100');
-            el.querySelector('.transform').classList.remove('scale-95');
         } else {
             el.classList.add('hidden');
+        }
+    }
+
+    function openRejectModal() {
+        if (currentMagangId) {
+            document.getElementById('form-reject-confirm').action = `/admin/pengajuan-magang/${currentMagangId}/tolak`;
+            toggleModal('modal-reject');
         }
     }
 
@@ -260,6 +317,7 @@
     }
 
     function openDetailModal(magang) {
+        currentMagangId = magang.id;
         // Data Registrasi (User)
         if (magang.user) {
             document.getElementById('admin-detail-nama').innerText = magang.nama_lengkap || magang.user.name || '-';
@@ -316,7 +374,6 @@
             
             // Set action URLs for the forms dynamically based on ID
             document.getElementById('form-terima').action = `/admin/pengajuan-magang/${magang.id}/terima`;
-            document.getElementById('form-tolak').action = `/admin/pengajuan-magang/${magang.id}/tolak`;
         } else {
             actionButtons.classList.add('hidden');
             if (magang.status_pengajuan === 'Diterima') badge.className += "bg-green-500";
@@ -325,6 +382,15 @@
             // Show Cetak button and set url
             btnCetak.href = `{{ url('admin/pengajuan-magang') }}/${magang.id}/cetak-surat`;
             btnCetak.classList.remove('hidden');
+
+            // Show rejection reason if status is Ditolak
+            const rejectSection = document.getElementById('admin-detail-rejection-section');
+            if (magang.status_pengajuan === 'Ditolak' && magang.alasan_penolakan) {
+                document.getElementById('admin-detail-alasan').innerText = magang.alasan_penolakan;
+                rejectSection.classList.remove('hidden');
+            } else {
+                rejectSection.classList.add('hidden');
+            }
         }
 
         toggleModal('modal-detail');

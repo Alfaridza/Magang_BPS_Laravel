@@ -203,18 +203,24 @@
             </div>
 
             @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 text-center" role="alert">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 text-center flash-message" role="alert">
                     <span class="block sm:inline font-bold">{{ session('success') }}</span>
+                    <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+                        <i class="fas fa-times text-green-700 hover:text-green-900"></i>
+                    </button>
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 flash-message">
                     <ul class="list-disc list-inside">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                    <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+                        <i class="fas fa-times text-red-700 hover:text-red-900"></i>
+                    </button>
                 </div>
             @endif
 
@@ -974,5 +980,8 @@ document.addEventListener("DOMContentLoaded", function() {
     validateStep2();
 });
 </script>
+
+<script src="{{ asset('js/auto-flash-close.js') }}" defer></script>
+
 </body>
 </html>

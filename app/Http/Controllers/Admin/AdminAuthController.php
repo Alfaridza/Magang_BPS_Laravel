@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,6 +28,7 @@ class AdminAuthController extends Controller
 
         if (Auth::guard('admin')->attempt($credentials)) {
             $request->session()->regenerate();
+            AdminActivityLog::record(Auth::guard('admin')->user(), 'login', 'Admin berhasil masuk ke dashboard.');
             return redirect()->intended('/admin/dashboard');
         }
 
@@ -37,6 +39,11 @@ class AdminAuthController extends Controller
 
     public function logout(Request $request)
     {
+        $admin = Auth::guard('admin')->user();
+        if ($admin) {
+            AdminActivityLog::record($admin, 'logout', 'Admin keluar dari sistem.');
+        }
+
         Auth::guard('admin')->logout();
         
         // Hanya invalidasi sesi admin agar peserta tidak ikut log out jika berada di tab lain

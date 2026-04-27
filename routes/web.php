@@ -48,6 +48,7 @@ Route::middleware(['auth:admin', 'is_admin'])->prefix('admin')->name('admin.')->
         Route::post('/pengajuan-magang/{id}/terima', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'terima'])->name('pengajuan_magang.terima');
         Route::post('/pengajuan-magang/{id}/tolak', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'tolak'])->name('pengajuan_magang.tolak');
         Route::get('/pengajuan-magang/{id}/cetak-surat', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'cetakSurat'])->name('pengajuan_magang.cetak_surat');
+        Route::get('/log-aktivitas', [App\Http\Controllers\Admin\AdminActivityLogController::class, 'index'])->name('log_activity.index');
 });
 
 Route::middleware('auth')->group(function () {

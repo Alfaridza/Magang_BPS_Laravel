@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ManajemenPesertaController extends Controller
@@ -67,6 +69,13 @@ class ManajemenPesertaController extends Controller
             'alamat' => $request->alamat,
         ]);
 
+        AdminActivityLog::record(Auth::guard('admin')->user(), 'Edit Peserta', 'Memperbarui data peserta ' . $peserta->email, User::class, $peserta->id);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $request->session()->flash('success', 'Berhasil memperbarui data peserta.');
+            return response()->json(['message' => 'Berhasil memperbarui data peserta.'], 200);
+        }
+
         return redirect()->route('admin.manajemen_peserta.index')->with('success', 'Berhasil memperbarui data peserta.');
     }
     
@@ -78,7 +87,9 @@ class ManajemenPesertaController extends Controller
         
         // Delete related pengajuan magang records first
         $user->pengajuanMagangs()->delete();
-        
+
+        AdminActivityLog::record(Auth::guard('admin')->user(), 'Hapus Peserta', 'Menghapus peserta ' . $user->email, User::class, $user->id);
+
         // Finally delete the user
         $user->delete();
         

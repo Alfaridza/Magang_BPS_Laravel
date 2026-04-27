@@ -21,6 +21,7 @@ class PengajuanMagang extends Model
         'surat_pengantar',
         'pas_foto',
         'status_pengajuan',
+        'alasan_penolakan',
     ];
 
     public function user()

@@ -3,6 +3,24 @@
 @section('header', 'Manajemen Peserta')
 
 @section('content')
+@if (session('success'))
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 flash-message" role="alert">
+        <span class="block sm:inline">{{ session('success') }}</span>
+        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+            <i class="fas fa-times text-green-700 hover:text-green-900"></i>
+        </button>
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 flash-message" role="alert">
+        <span class="block sm:inline">{{ session('error') }}</span>
+        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+            <i class="fas fa-times text-red-700 hover:text-red-900"></i>
+        </button>
+    </div>
+@endif
+
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 class="text-xl font-bold text-gray-800">Daftar Semua Peserta Terdaftar</h2>
@@ -65,12 +83,12 @@
                         </td>
                         <td class="py-3 px-4">
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <a href="{{ route('admin.manajemen_peserta.show', $peserta->id) }}" class="text-blue-600 hover:text-blue-900 text-sm">
+                                <button class="open-modal text-blue-600 hover:text-blue-900 text-sm" data-url="{{ route('admin.manajemen_peserta.show', $peserta->id) }}">
                                     <i class="fas fa-eye"></i> Lihat
-                                </a>
-                                <a href="{{ route('admin.manajemen_peserta.edit', $peserta->id) }}" class="text-yellow-600 hover:text-yellow-900 text-sm">
+                                </button>
+                                <button class="open-modal text-yellow-600 hover:text-yellow-900 text-sm" data-url="{{ route('admin.manajemen_peserta.edit', $peserta->id) }}">
                                     <i class="fas fa-edit"></i> Edit
-                                </a>
+                                </button>
                                 <form action="{{ route('admin.manajemen_peserta.destroy', $peserta->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini?')" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -103,4 +121,5 @@
         </div>
     @endif
 </div>
+
 @endsection

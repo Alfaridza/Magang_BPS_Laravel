@@ -1,78 +1,80 @@
-@extends('admin.layouts.app')
+<div class="flex items-center mb-6">
+    <h1 class="text-2xl font-normal text-gray-800 font-sans">Data Peserta</h1>
+</div>
 
-@section('header', 'Detail Peserta')
+<div class="bg-white rounded border border-gray-200 shadow-sm p-6 text-gray-700 max-w-2xl mb-2">
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 flash-message">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li class="list-disc ml-5">{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 flash-close-btn">
+                <i class="fas fa-times text-red-700 hover:text-red-900"></i>
+            </button>
+        </div>
+    @endif
 
-@section('content')
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-4xl">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-gray-800">Detail Peserta</h2>
-        <a href="{{ route('admin.manajemen_peserta.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">
-            Kembali
-        </a>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Nama Lengkap</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">{{ $peserta->name }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+        <div>
+            <label class="font-medium text-gray-600">Nama Lengkap</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">{{ $peserta->name }}</p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Email</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">{{ $peserta->email }}</p>
+        <div>
+            <label class="font-medium text-gray-600">Email</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">{{ $peserta->email }}</p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Nomor HP</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">{{ $peserta->no_hp ?? '-' }}</p>
+        <div>
+            <label class="font-medium text-gray-600">Nomor HP</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">{{ $peserta->no_hp ?? '-' }}</p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Jenis Kelamin</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">{{ $peserta->jenis_kelamin ?? '-' }}</p>
+        <div>
+            <label class="font-medium text-gray-600">Jenis Kelamin</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">{{ $peserta->jenis_kelamin ?? '-' }}</p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Tempat Lahir</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">{{ $peserta->tempat_lahir ?? '-' }}</p>
+        <div>
+            <label class="font-medium text-gray-600">Tempat Lahir</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">{{ $peserta->tempat_lahir ?? '-' }}</p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Tanggal Lahir</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+        <div>
+            <label class="font-medium text-gray-600">Tanggal Lahir</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">
                 {{ $peserta->tanggal_lahir ? \Carbon\Carbon::parse($peserta->tanggal_lahir)->format('d F Y') : '-' }}
             </p>
         </div>
 
-        <div class="md:col-span-2 mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Alamat</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 min-h-[60px]">{{ $peserta->alamat ?? '-' }}</p>
+        <div class="md:col-span-2">
+            <label class="font-medium text-gray-600">Alamat</label>
+            <p class="bg-gray-50 border rounded px-3 py-2 min-h-[60px]">
+                {{ $peserta->alamat ?? '-' }}
+            </p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Status Verifikasi Email</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+        <div>
+            <label class="font-medium text-gray-600">Status Email</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">
                 @if($peserta->email_verified_at)
-                    <span class="text-green-600 font-medium">Terverifikasi</span> pada {{ $peserta->email_verified_at->format('d M Y H:i:s') }}
+                    <span class="text-green-600">Terverifikasi</span>
                 @else
-                    <span class="text-red-500 font-medium">Belum Terverifikasi</span>
+                    <span class="text-red-500">Belum Terverifikasi</span>
                 @endif
             </p>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-semibold mb-2">Tanggal Registrasi</label>
-            <p class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">{{ $peserta->created_at->format('d M Y H:i:s') }}</p>
+        <div>
+            <label class="font-medium text-gray-600">Tanggal Registrasi</label>
+            <p class="bg-gray-50 border rounded px-3 py-2">
+                {{ $peserta->created_at->format('d M Y H:i') }}
+            </p>
         </div>
     </div>
 
-    <div class="mt-8 flex justify-end gap-3">
-        <a href="{{ route('admin.manajemen_peserta.index') }}" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition">
-            Kembali ke Daftar
-        </a>
-        <a href="{{ route('admin.manajemen_peserta.edit', $peserta->id) }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-            Edit Data
-        </a>
-    </div>
 </div>
-@endsection
