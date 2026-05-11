@@ -62,6 +62,10 @@
                         <p class="text-gray-800 font-medium"><i class="fab fa-whatsapp text-green-500 mr-2 w-4 text-center"></i> {{ $user->no_hp ?? 'Belum diatur' }}</p>
                     </div>
                     <div>
+                        <p class="text-sm text-gray-500 font-semibold mb-1">Tempat Lahir</p>
+                        <p class="text-gray-800 font-medium"> {{ $user->tempat_lahir ?? 'Belum diatur' }}</p>
+                    </div>
+                    <div>
                         <p class="text-sm text-gray-500 font-semibold mb-1">Status Akun</p>
                         <p class="text-gray-800 font-medium"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fas fa-user-check mr-1"></i> Terverifikasi</span></p>
                     </div>
@@ -115,9 +119,14 @@
                         <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm">
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">No. WhatsApp</label>
                         <input type="number" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm" placeholder="Contoh: 08123456789">
+                    </div>
+
+                     <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir) }}" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm" placeholder="Contoh: Tangerang">
                     </div>
 
                     <div class="md:col-span-2">

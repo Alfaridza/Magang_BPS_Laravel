@@ -63,7 +63,12 @@
 
                 <a href="{{ url('admin/manajemen-peserta') }}" class="flex items-center px-4 py-2.5 text-sm {{ request()->is('admin/manajemen-peserta') ? 'sidebar-link-active' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors' }}">
                     <i class="fas fa-users w-6 text-center"></i>
-                    <span class="ml-2 w-full">Manajemen Peserta</span>
+                    <span class="ml-2 w-full">Manajemen Akun Peserta</span>
+                </a>
+
+                <a href="{{ route('admin.peserta_magang_aktif.index') }}" class="flex items-center px-4 py-2.5 text-sm {{ request()->is('admin/peserta-magang-aktif*') ? 'sidebar-link-active' : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors' }}">
+                    <i class="fas fa-user-check w-6 text-center"></i>
+                    <span class="ml-2 w-full">Peserta Magang Aktif</span>
                 </a>
 
                 <!-- Divider for Approval Data -->
@@ -97,7 +102,53 @@
                 </div>
 
                 <!-- Right Top bar (Admin profile dropdown) -->
-                <div class="flex items-center">
+                <div class="flex items-center space-x-2">
+                    
+                    <!-- Notification Bell -->
+                    <div class="relative" id="admin-notification-container">
+                        <button id="admin-notification-button" class="text-gray-500 hover:text-gray-700 focus:outline-none relative p-2 rounded-full hover:bg-gray-100 transition">
+                            <i class="fas fa-bell text-xl"></i>
+                            @if(isset($pendingCount) && $pendingCount > 0)
+                                <span class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">{{ $pendingCount }}</span>
+                            @endif
+                        </button>
+
+                        <div id="admin-notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded shadow-lg z-50 overflow-hidden">
+                            <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                                <span class="text-sm font-bold text-gray-700">Pemberitahuan</span>
+                                @if(isset($pendingCount) && $pendingCount > 0)
+                                    <span class="text-xs font-semibold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">{{ $pendingCount }} Baru</span>
+                                @endif
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                @if(isset($pendingPengajuans) && count($pendingPengajuans) > 0)
+                                    @foreach($pendingPengajuans as $notifPengajuan)
+                                        <a href="{{ url('admin/pengajuan-magang') }}" class="block px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition">
+                                            <div class="flex items-start">
+                                                <div class="flex-shrink-0 bg-blue-100 text-blue-500 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-0.5">
+                                                    <i class="fas fa-user-edit text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-semibold text-gray-800">{{ $notifPengajuan->nama_lengkap ?? ($notifPengajuan->user->name ?? 'Peserta') }}</p>
+                                                    <p class="text-xs text-gray-500 mt-0.5">Mengirimkan pengajuan magang baru.</p>
+                                                    <p class="text-[10px] text-gray-400 mt-1">{{ \Carbon\Carbon::parse($notifPengajuan->created_at)->diffForHumans() }}</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                    <a href="{{ url('admin/pengajuan-magang') }}" class="block px-4 py-2 text-center text-xs font-semibold text-blue-600 hover:bg-blue-50 transition">
+                                        Lihat Semua Pengajuan
+                                    </a>
+                                @else
+                                    <div class="px-4 py-6 text-center text-gray-500 text-sm">
+                                        <i class="fas fa-check-circle text-gray-300 text-3xl mb-2 block"></i>
+                                        <br>Tidak ada pengajuan magang baru.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="relative" id="admin-user-menu-container">
                         <button id="admin-user-menu-button" class="flex items-center text-gray-700 hover:text-gray-900 font-semibold px-3 py-2 rounded-md hover:bg-gray-100 transition focus:outline-none">
                             <img src="{{ 'https://ui-avatars.com/api/?name='.urlencode(Auth::guard('admin')->user() ? Auth::guard('admin')->user()->name : 'Admin').'&background=1e293b&color=fff&size=128' }}" alt="Avatar" class="w-8 h-8 rounded-full mr-2 object-cover">
@@ -153,21 +204,41 @@
         document.addEventListener('DOMContentLoaded', function(){
             var btn = document.getElementById('admin-user-menu-button');
             var menu = document.getElementById('admin-user-menu-dropdown');
-
-            if (!btn || !menu) return;
+            
+            var notifBtn = document.getElementById('admin-notification-button');
+            var notifMenu = document.getElementById('admin-notification-dropdown');
 
             document.addEventListener('click', function(e){
-                if (btn.contains(e.target)) {
-                    menu.classList.toggle('hidden');
-                } else {
-                    if (!menu.contains(e.target)) {
-                        menu.classList.add('hidden');
+                // Handle user menu
+                if (btn && menu) {
+                    if (btn.contains(e.target)) {
+                        menu.classList.toggle('hidden');
+                        if (notifMenu) notifMenu.classList.add('hidden');
+                    } else {
+                        if (!menu.contains(e.target)) {
+                            menu.classList.add('hidden');
+                        }
+                    }
+                }
+                
+                // Handle notification menu
+                if (notifBtn && notifMenu) {
+                    if (notifBtn.contains(e.target)) {
+                        notifMenu.classList.toggle('hidden');
+                        if (menu) menu.classList.add('hidden');
+                    } else {
+                        if (!notifMenu.contains(e.target)) {
+                            notifMenu.classList.add('hidden');
+                        }
                     }
                 }
             });
 
             document.addEventListener('keydown', function(e){
-                if (e.key === 'Escape') menu.classList.add('hidden');
+                if (e.key === 'Escape') {
+                    if (menu) menu.classList.add('hidden');
+                    if (notifMenu) notifMenu.classList.add('hidden');
+                }
             });
         });
     </script>

@@ -33,9 +33,9 @@
                         <td class="py-3 px-4">{{ $index + 1 }}</td>
                         <td class="py-3 px-4">
                             @if($magang->user)
-                                <button onclick='openDetailModal(@json($magang))' class="font-bold text-gray-800 text-left hover:text-blue-600 transition focus:outline-none" title="Lihat Detail Peserta">
+                                <div class="font-bold text-gray-800">
                                     {{ $magang->nama_lengkap ?? $magang->user->name }}
-                                </button>
+                                </div>
                             @else
                                 <div class="font-bold text-gray-800">User terhapus</div>
                             @endif
@@ -67,24 +67,9 @@
                             @endif
                         </td>
                         <td class="py-3 px-4 text-center">
-                            @if($magang->status_pengajuan == 'Menunggu')
-                                <div class="flex justify-center space-x-2">
-                                    <form action="{{ route('admin.pengajuan_magang.terima', $magang->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin menerima pengajuan ini?');">
-                                        @csrf
-                                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded shadow transition" title="Terima">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('admin.pengajuan_magang.tolak', $magang->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin menolak pengajuan ini?');">
-                                        @csrf
-                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded shadow transition" title="Tolak">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            @else
-                                <span class="text-gray-400 italic text-xs">Selesai direview</span>
-                            @endif
+                            <button onclick='openDetailModal(@json($magang))' class="bg-blue-500 hover:bg-blue-600 text-white py-1.5 px-3 rounded shadow transition text-xs font-semibold" title="Lihat Detail & Tindakan">
+                                <i class="fas fa-eye mr-1"></i> View
+                            </button>
                         </td>
                     </tr>
                 @empty
@@ -181,6 +166,20 @@
                                 <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Jurusan (Jenjang)</p>
                                 <p id="admin-detail-jurusan" class="font-medium text-gray-800 mt-1"></p>
                             </div>
+                            <div class="grid grid-cols-2 gap-4" id="admin-detail-mahasiswa-section" class="hidden">
+                                <div>
+                                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Fakultas</p>
+                                    <p id="admin-detail-fakultas" class="font-medium text-gray-800 mt-1"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Semester</p>
+                                    <p id="admin-detail-semester" class="font-medium text-gray-800 mt-1"></p>
+                                </div>
+                            </div>
+                            <div id="admin-detail-siswa-section" class="hidden">
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Kelas</p>
+                                <p id="admin-detail-kelas" class="font-medium text-gray-800 mt-1"></p>
+                            </div>
                             <div class="grid grid-cols-2 gap-4 border-t border-gray-100 pt-3 mt-3">
                                 <div>
                                     <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Jenis</p>
@@ -209,6 +208,9 @@
                                 </a>
                                 <a id="admin-btn-foto" target="_blank" class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
                                     <i class="fas fa-image text-blue-500 mr-2"></i> Pas Foto
+                                </a>
+                                <a id="admin-btn-ktm" target="_blank" class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
+                                    <i class="fas fa-id-card text-green-500 mr-2"></i> KTM / Pelajar
                                 </a>
                             </div>
                         </div>
@@ -292,6 +294,7 @@
 
 <script>
     let currentMagangId = null;
+    let currentMagangData = null;
 
     function toggleModal(modalID) {
         let el = document.getElementById(modalID);
@@ -304,7 +307,7 @@
 
     function openRejectModal() {
         if (currentMagangId) {
-            document.getElementById('form-reject-confirm').action = `/admin/pengajuan-magang/${currentMagangId}/tolak`;
+            document.getElementById('form-reject-confirm').action = `{{ url('admin/pengajuan-magang') }}/${currentMagangId}/tolak`;
             toggleModal('modal-reject');
         }
     }
@@ -318,6 +321,7 @@
 
     function openDetailModal(magang) {
         currentMagangId = magang.id;
+        currentMagangData = magang;
         // Data Registrasi (User)
         if (magang.user) {
             document.getElementById('admin-detail-nama').innerText = magang.nama_lengkap || magang.user.name || '-';
@@ -338,12 +342,28 @@
         document.getElementById('admin-detail-jenis').innerText = magang.jenis_magang || '-';
         document.getElementById('admin-detail-tema').innerText = magang.tema_magang || '-';
         
+        // Handle conditional fields
+        const sectionMahasiswa = document.getElementById('admin-detail-mahasiswa-section');
+        const sectionSiswa = document.getElementById('admin-detail-siswa-section');
+        
+        if (magang.status_peserta === 'Siswa') {
+            document.getElementById('admin-detail-kelas').innerText = magang.kelas || '-';
+            sectionSiswa.classList.remove('hidden');
+            sectionMahasiswa.classList.add('hidden');
+        } else {
+            document.getElementById('admin-detail-fakultas').innerText = magang.fakultas || '-';
+            document.getElementById('admin-detail-semester').innerText = magang.semester || '-';
+            sectionMahasiswa.classList.remove('hidden');
+            sectionSiswa.classList.add('hidden');
+        }
+        
         const periodStr = `${formatDateIndonesian(magang.periode_mulai)} - ${formatDateIndonesian(magang.periode_selesai)}`;
         document.getElementById('admin-detail-periode').innerText = periodStr;
 
         // Berkas Links
         const btnSurat = document.getElementById('admin-btn-surat');
         const btnFoto = document.getElementById('admin-btn-foto');
+        const btnKtm = document.getElementById('admin-btn-ktm');
         if (magang.surat_pengantar) {
             btnSurat.href = `{{ url('storage') }}/${magang.surat_pengantar}`;
             btnSurat.classList.remove('opacity-50', 'pointer-events-none');
@@ -357,6 +377,13 @@
         } else {
             btnFoto.removeAttribute('href');
             btnFoto.classList.add('opacity-50', 'pointer-events-none');
+        }
+        if (magang.kartu_pelajar) {
+            btnKtm.href = `{{ url('storage') }}/${magang.kartu_pelajar}`;
+            btnKtm.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+            btnKtm.removeAttribute('href');
+            btnKtm.classList.add('opacity-50', 'pointer-events-none');
         }
 
         // Status & Actions
@@ -373,7 +400,7 @@
             btnCetak.classList.add('hidden');
             
             // Set action URLs for the forms dynamically based on ID
-            document.getElementById('form-terima').action = `/admin/pengajuan-magang/${magang.id}/terima`;
+            document.getElementById('form-terima').action = `{{ url('admin/pengajuan-magang') }}/${magang.id}/terima`;
         } else {
             actionButtons.classList.add('hidden');
             if (magang.status_pengajuan === 'Diterima') badge.className += "bg-green-500";
@@ -394,6 +421,17 @@
         }
 
         toggleModal('modal-detail');
+    }
+
+    function openEditModal() {
+        if (currentMagangData) {
+            document.getElementById('form-edit-pengajuan').action = `{{ url('admin/pengajuan-magang') }}/${currentMagangData.id}`;
+            document.getElementById('edit_periode_mulai').value = currentMagangData.periode_mulai ? currentMagangData.periode_mulai.split(' ')[0] : '';
+            document.getElementById('edit_periode_selesai').value = currentMagangData.periode_selesai ? currentMagangData.periode_selesai.split(' ')[0] : '';
+            document.getElementById('edit_tema_magang').value = currentMagangData.tema_magang || '';
+            
+            toggleModal('modal-edit');
+        }
     }
 </script>
 @endsection

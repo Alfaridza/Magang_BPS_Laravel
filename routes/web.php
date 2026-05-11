@@ -20,6 +20,17 @@ Route::get('auth/login', [AuthController::class, 'showLoginForm'])->name('login'
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Presensi Login (mobile-style) — sesi terpisah dari web utama
+Route::get('presensi/login', [AuthController::class, 'showPresensiLoginForm'])->name('presensi.login');
+Route::post('presensi/login', [AuthController::class, 'loginPresensi'])->name('presensi.login.post');
+Route::post('presensi/login-sistem', [AuthController::class, 'loginPresensiSistem'])->name('presensi.login_sistem');
+Route::post('presensi/logout', [AuthController::class, 'logoutPresensi'])->name('presensi.logout');
+
+// Route presensi — dilindungi middleware presensi.auth (bukan auth web)
+Route::middleware('presensi.auth')->group(function () {
+    Route::get('/peserta/presensi', [App\Http\Controllers\PesertaController::class, 'presensi'])->name('peserta.presensi');
+});
+
 Route::get('auth/setup-password/{id}', [AuthController::class, 'showSetupPasswordForm'])->name('setup_password.show');
 Route::post('auth/setup-password/{id}', [AuthController::class, 'setupPassword']);
 
@@ -44,6 +55,8 @@ Route::middleware(['auth:admin', 'is_admin'])->prefix('admin')->name('admin.')->
         Route::get('/manajemen-peserta/{id}/edit', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'edit'])->name('manajemen_peserta.edit');
         Route::put('/manajemen-peserta/{id}', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'update'])->name('manajemen_peserta.update');
         Route::delete('/manajemen-peserta/{id}', [App\Http\Controllers\Admin\ManajemenPesertaController::class, 'destroy'])->name('manajemen_peserta.destroy');
+
+        Route::resource('/peserta-magang-aktif', App\Http\Controllers\Admin\PesertaMagangAktifController::class)->except(['create', 'store'])->names('peserta_magang_aktif');
         Route::get('/pengajuan-magang', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'index'])->name('pengajuan_magang.index');
         Route::post('/pengajuan-magang/{id}/terima', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'terima'])->name('pengajuan_magang.terima');
         Route::post('/pengajuan-magang/{id}/tolak', [App\Http\Controllers\Admin\PengajuanMagangController::class, 'tolak'])->name('pengajuan_magang.tolak');
@@ -58,7 +71,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/daftar-magang', [App\Http\Controllers\PesertaController::class, 'daftarMagang'])->name('daftar_magang');
         Route::get('/profil', [App\Http\Controllers\PesertaController::class, 'profil'])->name('profil');
         Route::post('/profil', [App\Http\Controllers\PesertaController::class, 'updateProfil']);
+        Route::get('/cek-presensi', [App\Http\Controllers\PesertaController::class, 'cekPresensi'])->name('cek_presensi');
+        // Route presensi dipindah ke middleware presensi.auth (di atas)
     });
 
     Route::post('/pengajuan-magang', [PengajuanMagangController::class, 'store']);
+    Route::put('/pengajuan-magang/{id}', [PengajuanMagangController::class, 'update']);
 });

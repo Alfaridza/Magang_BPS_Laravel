@@ -50,7 +50,7 @@
                     <th class="py-4 px-4 border-b">Admin</th>
                     <th class="py-4 px-4 border-b">Aksi</th>
                     <th class="py-4 px-4 border-b">Deskripsi</th>
-                    <th class="py-4 px-4 border-b">IP Address</th>
+
                 </tr>
             </thead>
             <tbody class="text-sm text-gray-600">
@@ -73,13 +73,11 @@
                         <td class="py-3 px-4">
                             {{ $log->description }}
                         </td>
-                        <td class="py-3 px-4 text-xs font-mono text-gray-400">
-                            {{ $log->ip_address }}
-                        </td>
+
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="py-8 text-center text-gray-500 font-medium">
+                        <td colspan="4" class="py-8 text-center text-gray-500 font-medium">
                             Tidak ada data log aktivitas ditemukan.
                         </td>
                     </tr>

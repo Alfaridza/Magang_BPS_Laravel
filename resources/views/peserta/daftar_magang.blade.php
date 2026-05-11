@@ -27,7 +27,7 @@
 
     <div class="mb-4">
         <!-- Using custom green from the image -->
-        <button onclick="toggleModal('modal-pengajuan')" class="bg-[#99e6d9] hover:bg-[#7dd3c5] text-white font-bold py-2 px-6 rounded shadow-sm text-sm uppercase tracking-wider transition">
+        <button onclick="openCreateModal()" class="bg-[#99e6d9] hover:bg-[#7dd3c5] text-white font-bold py-2 px-6 rounded shadow-sm text-sm uppercase tracking-wider transition">
             + DAFTAR MAGANG
         </button>
     </div>
@@ -62,6 +62,9 @@
                         </td>
                         <td class="py-4 px-6 text-center">
                             <button onclick='openDetailModal(@json($magang))' class="text-blue-500 hover:text-blue-700 mx-1 transition rounded-full hover:bg-blue-100 p-2" title="Detail"><i class="fas fa-eye"></i></button>
+                            @if($magang->status_pengajuan == 'Menunggu')
+                                <button onclick='openEditModal(@json($magang))' class="text-yellow-500 hover:text-yellow-700 mx-1 transition rounded-full hover:bg-yellow-100 p-2" title="Edit"><i class="fas fa-edit"></i></button>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -95,6 +98,7 @@
             <div class="bg-white px-6 py-5 sm:p-8">
                 <form action="{{ url('pengajuan-magang') }}" method="POST" enctype="multipart/form-data" id="form-pengajuan">
                     @csrf
+                    <div id="method-container"></div>
                     
                     <!-- STEP 1: Biodata & Akademik -->
                     <div id="step-1" class="space-y-6 block">
@@ -102,7 +106,7 @@
                             <!-- Status Peserta -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Status Peserta</label>
-                                <select name="status_peserta" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border bg-gray-50 focus:bg-white transition shadow-sm bgcheck-1">
+                                <select name="status_peserta" id="status_peserta" onchange="handleStatusChange()" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border bg-gray-50 focus:bg-white transition shadow-sm bgcheck-1">
                                     <option value="" disabled selected>Pilih Status</option>
                                     <option value="Mahasiswa" {{ old('status_peserta') == 'Mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                                     <option value="Fresh graduated" {{ old('status_peserta') == 'Fresh graduated' ? 'selected' : '' }}>Fresh graduated</option>
@@ -119,7 +123,7 @@
                             <!-- Jenis Magang -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Magang</label>
-                                <select name="jenis_magang" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border bg-gray-50 focus:bg-white transition shadow-sm bgcheck-1">
+                                <select name="jenis_magang" id="jenis_magang" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border bg-gray-50 focus:bg-white transition shadow-sm bgcheck-1">
                                     <option value="" disabled selected>Pilih Jenis</option>
                                     <option value="Magang Wajib/PKL" {{ old('jenis_magang') == 'Magang Wajib/PKL' ? 'selected' : '' }}>Magang Wajib/PKL</option>
                                     <option value="Magang Mandiri" {{ old('jenis_magang') == 'Magang Mandiri' ? 'selected' : '' }}>Magang Mandiri</option>
@@ -133,9 +137,9 @@
                             </div>
 
                             <!-- Jenjang Pendidikan -->
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Jenjang Pendidikan</label>
-                                <select name="jenjang_pendidikan" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border bg-gray-50 focus:bg-white transition shadow-sm bgcheck-1">
+                                <select name="jenjang_pendidikan" id="jenjang_pendidikan" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border bg-gray-50 focus:bg-white transition shadow-sm bgcheck-1">
                                     <option value="" disabled selected>Pilih Jenjang</option>
                                     <option value="SMK/SMA" {{ old('jenjang_pendidikan') == 'SMK/SMA' ? 'selected' : '' }}>SMK/SMA</option>
                                     <option value="Diploma" {{ old('jenjang_pendidikan') == 'Diploma' ? 'selected' : '' }}>Diploma</option>
@@ -145,14 +149,32 @@
 
                             <!-- Nama Sekolah/PT -->
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Sekolah / Perguruan Tinggi</label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" id="label_nama_sekolah">Nama Sekolah / Perguruan Tinggi</label>
                                 <input type="text" name="nama_sekolah" id="nama_sekolah" value="{{ old('nama_sekolah') }}" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white bgcheck-1">
                             </div>
 
+                            <!-- Fakultas (Mahasiswa/Fresh Grad) -->
+                            <div id="container-fakultas" class="hidden md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fakultas</label>
+                                <input type="text" name="fakultas" id="fakultas" value="{{ old('fakultas') }}" class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white bgcheck-1">
+                            </div>
+
                             <!-- Jurusan -->
-                            <div class="md:col-span-2">
+                            <div class="md:col-span-1" id="container-jurusan">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Jurusan</label>
                                 <input type="text" name="jurusan" id="jurusan" value="{{ old('jurusan') }}" required class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white bgcheck-1">
+                            </div>
+
+                            <!-- Semester (Mahasiswa/Fresh Grad) -->
+                            <div id="container-semester" class="hidden md:col-span-1">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Semester</label>
+                                <input type="text" name="semester" id="semester" value="{{ old('semester') }}" class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white bgcheck-1">
+                            </div>
+
+                            <!-- Kelas (Siswa) -->
+                            <div id="container-kelas" class="hidden md:col-span-1">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+                                <input type="text" name="kelas" id="kelas" value="{{ old('kelas') }}" class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white bgcheck-1">
                             </div>
 
                             <!-- Periode Mulai -->
@@ -170,7 +192,7 @@
                             <!-- Tema Magang (Opsional) -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Tema Magang (Opsional)</label>
-                                <textarea name="tema_magang" rows="3" class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white">{{ old('tema_magang') }}</textarea>
+                                <textarea name="tema_magang" id="tema_magang" rows="3" class="w-full rounded-xl border-gray-300 focus:border-[#0099CC] focus:ring-[#0099CC] px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white">{{ old('tema_magang') }}</textarea>
                             </div>
                         </div>
 
@@ -195,7 +217,7 @@
                             <i class="fas fa-info-circle text-blue-600 mt-1 mr-3 text-lg"></i>
                             <div>
                                 <h5 class="font-bold text-blue-800 text-sm">Persyaratan Berkas Wajib</h5>
-                                <p class="text-sm text-blue-700">Pastikan file surat pengantar (PDF/DOCX) dan Pas Foto (JPG/PNG) berukuran maksimal 5MB.</p>
+                                <p class="text-sm text-blue-700">Pastikan file surat pengantar (PDF/DOCX), Pas Foto (JPG/PNG), dan KTM/Kartu Pelajar (PDF/JPG/PNG) berukuran maksimal 5MB.</p>
                             </div>
                         </div>
 
@@ -214,12 +236,24 @@
 
                             <!-- Pas Foto -->
                             <div class="group">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Pas Foto Resmi <span class="text-red-500">*</span></label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Pas Foto Resmi (Ukuran 4x6 cm Background Merah)<span class="text-red-500">*</span></label>
                                 <div id="container-foto" class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#0099CC] transition cursor-pointer bg-gray-50 hover:bg-[#E6F7FF]">
                                     <input type="file" name="pas_foto" id="pas_foto" accept=".jpg,.jpeg,.png" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="updateFileLabel(this, 'label-foto', 'icon-foto', 'container-foto')">
                                     <div class="relative z-10 pointer-events-none">
                                         <i id="icon-foto" class="fas fa-image text-3xl text-gray-400 mb-2 group-hover:text-[#0099CC] transition"></i>
                                         <p id="label-foto" class="text-sm text-gray-500 group-hover:text-gray-800 font-medium truncate px-4">Upload Pas Foto</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KTM / Kartu Pelajar -->
+                            <div class="group md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">KTM / Kartu Pelajar <span class="text-red-500">*</span></label>
+                                <div id="container-ktm" class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#0099CC] transition cursor-pointer bg-gray-50 hover:bg-[#E6F7FF]">
+                                    <input type="file" name="kartu_pelajar" id="kartu_pelajar" accept=".pdf,.jpg,.jpeg,.png" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="updateFileLabel(this, 'label-ktm', 'icon-ktm', 'container-ktm')">
+                                    <div class="relative z-10 pointer-events-none">
+                                        <i id="icon-ktm" class="fas fa-id-card text-3xl text-gray-400 mb-2 group-hover:text-[#0099CC] transition"></i>
+                                        <p id="label-ktm" class="text-sm text-gray-500 group-hover:text-gray-800 font-medium truncate px-4">Upload KTM / Kartu Pelajar</p>
                                     </div>
                                 </div>
                             </div>
@@ -272,6 +306,12 @@
                         </div>
                     </div>
 
+                    <!-- Alasan Penolakan -->
+                    <div id="wrapper-detail-alasan" class="hidden pb-4 border-b border-gray-100">
+                        <p class="text-sm text-red-500 font-semibold uppercase tracking-wider mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Alasan Penolakan</p>
+                        <p id="detail-alasan" class="font-medium text-red-700 bg-red-50 p-3 rounded-lg border border-red-100 text-sm"></p>
+                    </div>
+
                     <!-- Grid Info -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
                         <!-- Identitas -->
@@ -295,9 +335,21 @@
                             <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Sekolah / Kampus</p>
                             <p id="detail-instansi" class="font-medium text-gray-800 mt-1"></p>
                         </div>
+                        <div id="wrapper-detail-fakultas" class="hidden">
+                            <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Fakultas</p>
+                            <p id="detail-fakultas" class="font-medium text-gray-800 mt-1"></p>
+                        </div>
                         <div>
                             <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Jurusan (Jenjang)</p>
                             <p id="detail-jurusan" class="font-medium text-gray-800 mt-1"></p>
+                        </div>
+                        <div id="wrapper-detail-kelas" class="hidden">
+                            <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Kelas</p>
+                            <p id="detail-kelas" class="font-medium text-gray-800 mt-1"></p>
+                        </div>
+                        <div id="wrapper-detail-semester" class="hidden">
+                            <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Semester</p>
+                            <p id="detail-semester" class="font-medium text-gray-800 mt-1"></p>
                         </div>
 
                         <!-- Info Magang -->
@@ -324,11 +376,14 @@
                         </div>
                         
                         <div class="col-span-1 sm:col-span-2 flex space-x-4">
-                            <a id="btn-download-surat" target="_blank" class="flex-1 max-w-[50%] inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
+                            <a id="btn-download-surat" target="_blank" class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
                                 <i class="fas fa-file-pdf text-red-500 mr-2"></i> Surat Pengantar
                             </a>
-                            <a id="btn-download-foto" target="_blank" class="flex-1 max-w-[50%] inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
+                            <a id="btn-download-foto" target="_blank" class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
                                 <i class="fas fa-image text-blue-500 mr-2"></i> Pas Foto
+                            </a>
+                            <a id="btn-download-ktm" target="_blank" class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition">
+                                <i class="fas fa-id-card text-green-500 mr-2"></i> KTM / Kartu Pelajar
                             </a>
                         </div>
                     </div>
@@ -373,6 +428,25 @@
         document.getElementById('detail-nim').innerText = magang.nim_nisn || '-';
         document.getElementById('detail-instansi').innerText = magang.nama_sekolah || '-';
         document.getElementById('detail-jurusan').innerText = `${magang.jurusan || '-'} (${magang.jenjang_pendidikan || '-'})`;
+        
+        // Handle conditional fields
+        const wrapperFakultas = document.getElementById('wrapper-detail-fakultas');
+        const wrapperSemester = document.getElementById('wrapper-detail-semester');
+        const wrapperKelas = document.getElementById('wrapper-detail-kelas');
+        
+        if (magang.status_peserta === 'Siswa') {
+            document.getElementById('detail-kelas').innerText = magang.kelas || '-';
+            wrapperKelas.classList.remove('hidden');
+            wrapperFakultas.classList.add('hidden');
+            wrapperSemester.classList.add('hidden');
+        } else {
+            document.getElementById('detail-fakultas').innerText = magang.fakultas || '-';
+            document.getElementById('detail-semester').innerText = magang.semester || '-';
+            wrapperFakultas.classList.remove('hidden');
+            wrapperSemester.classList.remove('hidden');
+            wrapperKelas.classList.add('hidden');
+        }
+        
         document.getElementById('detail-jenis').innerText = magang.jenis_magang || '-';
         document.getElementById('detail-tema').innerText = magang.tema_magang || '-';
         
@@ -385,19 +459,29 @@
 
         // Badge Styling
         const badge = document.getElementById('detail-status-badge');
+        const wrapperAlasan = document.getElementById('wrapper-detail-alasan');
         badge.innerText = magang.status_pengajuan;
         badge.className = "inline-block px-3 py-1 rounded-md text-sm font-bold "; // reset classes
         if (magang.status_pengajuan === 'Menunggu') {
             badge.className += "bg-yellow-100 text-yellow-800";
+            wrapperAlasan.classList.add('hidden');
         } else if (magang.status_pengajuan === 'Diterima') {
             badge.className += "bg-green-100 text-green-800";
+            wrapperAlasan.classList.add('hidden');
         } else {
             badge.className += "bg-red-100 text-red-800";
+            if (magang.alasan_penolakan) {
+                document.getElementById('detail-alasan').innerText = magang.alasan_penolakan;
+                wrapperAlasan.classList.remove('hidden');
+            } else {
+                wrapperAlasan.classList.add('hidden');
+            }
         }
 
         // Setup File links (assume storage links are correctly formatted)
         const btnSurat = document.getElementById('btn-download-surat');
         const btnFoto = document.getElementById('btn-download-foto');
+        const btnKtm = document.getElementById('btn-download-ktm');
         
         if (magang.surat_pengantar) {
             btnSurat.href = `{{ url('storage') }}/${magang.surat_pengantar}`;
@@ -411,6 +495,13 @@
             btnFoto.classList.remove('hidden');
         } else {
             btnFoto.classList.add('hidden');
+        }
+
+        if (magang.kartu_pelajar) {
+            btnKtm.href = `{{ url('storage') }}/${magang.kartu_pelajar}`;
+            btnKtm.classList.remove('hidden');
+        } else {
+            btnKtm.classList.add('hidden');
         }
 
         // Open Modal
@@ -527,6 +618,134 @@
                 }
             });
         }
+
+        // Initialize status field logic
+        handleStatusChange();
     });
+
+    function handleStatusChange() {
+        const status = document.getElementById('status_peserta').value;
+        const containerFakultas = document.getElementById('container-fakultas');
+        const containerSemester = document.getElementById('container-semester');
+        const containerKelas = document.getElementById('container-kelas');
+        const labelNamaSekolah = document.getElementById('label_nama_sekolah');
+        const inputFakultas = document.getElementById('fakultas');
+        const inputSemester = document.getElementById('semester');
+        const inputKelas = document.getElementById('kelas');
+
+        if (status === 'Siswa') {
+            labelNamaSekolah.innerText = 'Nama Sekolah';
+            
+            containerKelas.classList.remove('hidden');
+            containerKelas.classList.add('block');
+            inputKelas.required = true;
+
+            containerFakultas.classList.add('hidden');
+            containerFakultas.classList.remove('block');
+            inputFakultas.required = false;
+
+            containerSemester.classList.add('hidden');
+            containerSemester.classList.remove('block');
+            inputSemester.required = false;
+        } else if (status === 'Mahasiswa' || status === 'Fresh graduated') {
+            labelNamaSekolah.innerText = 'Nama Universitas';
+            
+            containerFakultas.classList.remove('hidden');
+            containerFakultas.classList.add('block');
+            inputFakultas.required = true;
+
+            containerSemester.classList.remove('hidden');
+            containerSemester.classList.add('block');
+            inputSemester.required = true;
+
+            containerKelas.classList.add('hidden');
+            containerKelas.classList.remove('block');
+            inputKelas.required = false;
+        } else {
+            labelNamaSekolah.innerText = 'Nama Sekolah / Perguruan Tinggi';
+            containerFakultas.classList.add('hidden');
+            containerSemester.classList.add('hidden');
+            containerKelas.classList.add('hidden');
+            inputFakultas.required = false;
+            inputSemester.required = false;
+            inputKelas.required = false;
+        }
+    }
+
+    function openCreateModal() {
+        document.getElementById('form-pengajuan').reset();
+        document.getElementById('form-pengajuan').action = `{{ url('pengajuan-magang') }}`;
+        document.getElementById('method-container').innerHTML = '';
+        document.getElementById('modal-title').innerText = 'Formulir Pengajuan Magang';
+        
+        // reset UI for files
+        document.getElementById('label-surat').innerText = 'Upload Surat Pengantar';
+        document.getElementById('label-foto').innerText = 'Upload Pas Foto';
+        document.getElementById('label-ktm').innerText = 'Upload KTM / Kartu Pelajar';
+        
+        document.getElementById('surat_pengantar').required = true;
+        document.getElementById('pas_foto').required = true;
+        document.getElementById('kartu_pelajar').required = true;
+        
+        // Reset unlock state
+        goToStep(1);
+        isStep1Saved = false;
+        document.getElementById('btn-simpan-1').innerHTML = 'Simpan';
+        document.getElementById('btn-simpan-1').classList.replace('bg-gray-500', 'bg-[#0099CC]');
+        document.getElementById('btn-simpan-1').classList.replace('hover:bg-gray-600', 'hover:bg-blue-600');
+        document.getElementById('btn-lanjut-1').classList.add('hidden');
+        document.querySelectorAll('#step-1-inputs input').forEach(input => input.removeAttribute('readonly'));
+        document.querySelectorAll('#step-1-inputs select').forEach(s => s.style.pointerEvents = 'auto');
+
+        handleStatusChange();
+        toggleModal('modal-pengajuan');
+    }
+
+    function openEditModal(magang) {
+        document.getElementById('form-pengajuan').reset();
+        document.getElementById('form-pengajuan').action = `{{ url('pengajuan-magang') }}/${magang.id}`;
+        document.getElementById('method-container').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+        document.getElementById('modal-title').innerText = 'Edit Pengajuan Magang';
+
+        // populate fields
+        document.getElementById('status_peserta').value = magang.status_peserta;
+        document.getElementById('nama_lengkap').value = magang.nama_lengkap;
+        document.getElementById('jenis_magang').value = magang.jenis_magang;
+        document.getElementById('nim_nisn').value = magang.nim_nisn;
+        document.getElementById('jenjang_pendidikan').value = magang.jenjang_pendidikan;
+        document.getElementById('nama_sekolah').value = magang.nama_sekolah;
+        
+        if (magang.fakultas) document.getElementById('fakultas').value = magang.fakultas;
+        if (magang.jurusan) document.getElementById('jurusan').value = magang.jurusan;
+        if (magang.kelas) document.getElementById('kelas').value = magang.kelas;
+        if (magang.semester) document.getElementById('semester').value = magang.semester;
+        
+        // date inputs expects YYYY-MM-DD
+        document.getElementById('periode_mulai').value = magang.periode_mulai.split(' ')[0];
+        document.getElementById('periode_selesai').value = magang.periode_selesai.split(' ')[0];
+        document.getElementById('tema_magang').value = magang.tema_magang || '';
+
+        // file inputs (remove required because they already exist)
+        document.getElementById('surat_pengantar').required = false;
+        document.getElementById('pas_foto').required = false;
+        document.getElementById('kartu_pelajar').required = false;
+        
+        document.getElementById('label-surat').innerText = 'Berkas tersimpan (Upload baru untuk ganti)';
+        document.getElementById('label-foto').innerText = 'Berkas tersimpan (Upload baru untuk ganti)';
+        document.getElementById('label-ktm').innerText = 'Berkas tersimpan (Upload baru untuk ganti)';
+        
+        // Reset unlock state
+        goToStep(1);
+        isStep1Saved = false;
+        document.getElementById('btn-simpan-1').innerHTML = 'Simpan';
+        document.getElementById('btn-simpan-1').classList.replace('bg-gray-500', 'bg-[#0099CC]');
+        document.getElementById('btn-simpan-1').classList.replace('hover:bg-gray-600', 'hover:bg-blue-600');
+        document.getElementById('btn-lanjut-1').classList.add('hidden');
+        document.querySelectorAll('#step-1-inputs input').forEach(input => input.removeAttribute('readonly'));
+        document.querySelectorAll('#step-1-inputs select').forEach(s => s.style.pointerEvents = 'auto');
+
+        handleStatusChange();
+        toggleModal('modal-pengajuan');
+    }
 </script>
 @endsection

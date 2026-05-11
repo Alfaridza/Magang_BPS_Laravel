@@ -132,6 +132,9 @@
         <p style="text-align: justify;">
             Bersama ini disampaikan bahwa berdasarkan hasil seleksi berkas dan ketersediaan kuota, <b>dengan berat hati pengajuan magang Ditolak</b> 
             untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik Provinsi Banten untuk periode yang diajukan.
+            <?php if($pengajuan->alasan_penolakan): ?>
+                Adapun alasan penolakan pengajuan magang ini adalah <b><?= $pengajuan->alasan_penolakan ?></b>.
+            <?php endif; ?>
         </p>
     <?php endif; ?>
 
@@ -144,8 +147,9 @@
         <br>
         Kepala BPS Provinsi Banten,
         <br><br><br><br><br>
-        <b>Nama Kepala BPS Provinsi Banten</b>
+        <b>John Doe</b>
     </div>
+    
 
     <div class="bsre-footer">
         Dokumen ini telah ditanda tangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan oleh Balai Besar Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara (BSSN).

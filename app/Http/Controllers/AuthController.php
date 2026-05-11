@@ -81,6 +81,62 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showPresensiLoginForm()
+    {
+        // Jika sudah login presensi, langsung ke halaman presensi
+        if (session()->has('presensi_user_id')) {
+            return redirect()->route('peserta.presensi');
+        }
+        return view('presensi.login');
+    }
+
+    public function loginPresensi(Request $request)
+    {
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        // Verifikasi kredensial tanpa membuat sesi web utama
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+        if (!$user || !\Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'email' => 'Email atau Password yang Anda masukkan salah.',
+            ])->onlyInput('email');
+        }
+
+        // Simpan ke session khusus presensi (terpisah dari auth web utama)
+        $request->session()->put('presensi_user_id', $user->id);
+
+        return redirect()->route('peserta.presensi');
+    }
+
+    public function loginPresensiSistem(Request $request)
+    {
+        // Pastikan user sudah login di sistem web utama
+        if (!Auth::check()) {
+            return back()->withErrors(['email' => 'Anda belum login di sistem. Silakan login manual.']);
+        }
+
+        // Ambil data user yang sedang login
+        $user = Auth::user();
+
+        // Simpan ke session khusus presensi
+        $request->session()->put('presensi_user_id', $user->id);
+
+        return redirect()->route('peserta.presensi');
+    }
+
+    public function logoutPresensi(Request $request)
+    {
+        // Hapus hanya session presensi, session web utama tetap utuh
+        $request->session()->forget('presensi_user_id');
+
+        return redirect()->route('presensi.login')
+            ->with('success', 'Anda telah keluar dari sistem presensi.');
+    }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([

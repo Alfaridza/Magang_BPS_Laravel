@@ -60,6 +60,11 @@
                     <i class="fas fa-user w-6 text-center"></i>
                     <span class="ml-2 w-full">Profil Saya</span>
                 </a>
+
+                <a href="{{ route('peserta.cek_presensi') }}" class="flex items-center px-4 py-2.5 text-sm {{ request()->is('peserta/cek-presensi') || request()->is('peserta/presensi') ? 'sidebar-link-active' : 'text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors' }}">
+                    <i class="fas fa-clipboard-check w-6 text-center"></i>
+                    <span class="ml-2 w-full">Presensi</span>
+                </a>
             </nav>
         </aside>
 
@@ -73,7 +78,7 @@
                     <button class="text-gray-500 focus:outline-none focus:text-gray-700 md:hidden p-2 rounded-md hover:bg-gray-100">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
-                    <h2 class="ml-4 text-xl font-semibold text-gray-800 hidden sm:block">@yield('header', 'Beranda')</h2>
+                    <h2 class="ml-4 text-xl font-semibold text-gray-800 hidden sm:block">@yield('header', 'Presensi')</h2>
                 </div>
 
                 <!-- Right Top bar (Logout) -->
