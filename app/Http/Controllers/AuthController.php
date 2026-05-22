@@ -76,6 +76,47 @@ class AuthController extends Controller
         return redirect('/auth/login')->with('success', 'Password berhasil diatur! Silakan login untuk melengkapi profil Anda.');
     }
 
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgot_password');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'Email tidak ditemukan di sistem kami.',
+            ])->onlyInput('email');
+        }
+
+        // Pastikan akun sudah terverifikasi (pernah setup password)
+        if (!$user->email_verified_at) {
+            return back()->withErrors([
+                'email' => 'Akun ini belum diaktifkan. Silakan periksa email Anda untuk tautan aktivasi akun.',
+            ])->onlyInput('email');
+        }
+
+        try {
+            $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'setup_password.show', now()->addMinutes(60), ['id' => $user->id]
+            );
+
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($user, $url));
+
+            return back()->with('success', 'Tautan reset password telah dikirim ke email ' . $user->email . '. Silakan periksa inbox atau folder spam Anda.');
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'email' => 'Gagal mengirim email. Pastikan koneksi server SMTP berfungsi. Detail: ' . $e->getMessage(),
+            ])->onlyInput('email');
+        }
+    }
+
     public function showLoginForm()
     {
         return view('auth.login');
@@ -85,7 +126,7 @@ class AuthController extends Controller
     {
         // Jika sudah login presensi, langsung ke halaman presensi
         if (session()->has('presensi_user_id')) {
-            return redirect()->route('peserta.presensi');
+            return redirect()->route('presensi.dashboard');
         }
         return view('presensi.login');
     }
@@ -109,7 +150,7 @@ class AuthController extends Controller
         // Simpan ke session khusus presensi (terpisah dari auth web utama)
         $request->session()->put('presensi_user_id', $user->id);
 
-        return redirect()->route('peserta.presensi');
+        return redirect()->route('presensi.dashboard');
     }
 
     public function loginPresensiSistem(Request $request)
@@ -125,7 +166,7 @@ class AuthController extends Controller
         // Simpan ke session khusus presensi
         $request->session()->put('presensi_user_id', $user->id);
 
-        return redirect()->route('peserta.presensi');
+        return redirect()->route('presensi.dashboard');
     }
 
     public function logoutPresensi(Request $request)

@@ -113,6 +113,9 @@
                                 </span>
                                 <input type="password" name="password" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-bps-light focus:border-bps-light outline-none transition bg-gray-50 focus:bg-white" placeholder="Masukkan password Anda">
                             </div>
+                            <div class="text-right mt-2">
+                                <a href="{{ route('forgot_password.show') }}" class="text-sm text-bps-light hover:text-bps-dark font-medium hover:underline transition">Lupa Password?</a>
+                            </div>
                         </div>
 
                         <button type="submit" class="w-full bg-bps-dark text-white font-bold py-4 px-4 rounded-xl hover:bg-opacity-90 transition transform hover:-translate-y-0.5 shadow-lg shadow-bps-dark/30 flex justify-center items-center">

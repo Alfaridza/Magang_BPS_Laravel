@@ -67,6 +67,9 @@
                                 <a href="{{ route('admin.peserta_magang_aktif.edit', $magang->id) }}" class="text-yellow-600 hover:text-yellow-900 text-base" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                <a href="{{ route('admin.peserta_magang_aktif.laporan_presensi', $magang->id) }}" class="text-green-600 hover:text-green-900 text-base" title="Laporan Presensi">
+                                    <i class="fas fa-file-invoice"></i>
+                                </a>
                                 <form action="{{ route('admin.peserta_magang_aktif.destroy', $magang->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pengajuan magang ini? Akun pengguna tidak akan terhapus.')" class="inline">
                                     @csrf
                                     @method('DELETE')

@@ -26,7 +26,9 @@ class AdminAuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::guard('admin')->attempt($credentials)) {
+        $remember = $request->has('remember');
+
+        if (Auth::guard('admin')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
             AdminActivityLog::record(Auth::guard('admin')->user(), 'login', 'Admin berhasil masuk ke dashboard.');
             return redirect()->intended('/admin/dashboard');

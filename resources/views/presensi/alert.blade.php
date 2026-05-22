@@ -1,4 +1,4 @@
-@extends('peserta.layouts.app')
+@extends('presensi.layouts.app')
 
 @section('header', 'Informasi Akses Presensi')
 

@@ -72,8 +72,8 @@
                     </div>
 
                     <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900">Buat Akun Baru</h3>
-                        <p class="text-gray-500 mt-1">Lengkapi data diri Anda dengan benar.</p>
+                        <h3 class="text-2xl font-bold text-gray-900">Registrasi Akun </h3>
+                        <p class="text-gray-500 mt-1">Gunakan email aktif anda untuk proses registrasi akun.</p>
                     </div>
 
                     @if ($errors->any())
@@ -92,7 +92,7 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Email Aktif</label>
                             <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-bps-light focus:border-bps-light outline-none transition bg-gray-50 focus:bg-white" placeholder="nama@email.com">
-                            <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Tautan untuk mengatur password akan dikirim ke email ini. Biodata lengkap akan diisi setelah login.</p>
+                            <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Tautan verifikasi dan pengaturan password akan dikirim ke email yang didaftarkan. Data profil dapat dilengkapi setelah login.</p>
                         </div>
 
                         <button type="submit" class="w-full bg-bps-dark text-white font-bold py-3.5 px-4 rounded-xl hover:bg-opacity-90 transition transform hover:-translate-y-0.5 mt-6 shadow-lg shadow-bps-dark/30 flex justify-center items-center">

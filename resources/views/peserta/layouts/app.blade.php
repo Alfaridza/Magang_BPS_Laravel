@@ -33,8 +33,9 @@
                 <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white p-0.5">
                     <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="max-w-full h-auto">
                 </div>
-                <div class="text-sm font-semibold leading-tight leading-4">
-                    Sistem Informasi Magang & PKL
+                <div class="text-white font-bold leading-tight">
+                    <span class="block text-lg tracking-wide font-extrabold text-white">SIGMA BANTEN</span>
+                    <span class="block text-[10px] text-gray-300 font-normal leading-3 mt-0.5">Sistem Informasi Magang BPS Provinsi Banten</span>
                 </div>
             </div>
 
@@ -61,7 +62,7 @@
                     <span class="ml-2 w-full">Profil Saya</span>
                 </a>
 
-                <a href="{{ route('peserta.cek_presensi') }}" class="flex items-center px-4 py-2.5 text-sm {{ request()->is('peserta/cek-presensi') || request()->is('peserta/presensi') ? 'sidebar-link-active' : 'text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors' }}">
+                <a href="{{ route('presensi.cek_kelayakan') }}" target="_blank" class="flex items-center px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors">
                     <i class="fas fa-clipboard-check w-6 text-center"></i>
                     <span class="ml-2 w-full">Presensi</span>
                 </a>

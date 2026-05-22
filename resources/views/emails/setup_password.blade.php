@@ -18,7 +18,7 @@
         
         <br>
         <p>Tautan ini akan kedaluwarsa dalam 60 menit.</p>
-        <p>Salam hangat,<br>Tim Magang BPS Provinsi Banten</p>
+        <p>Salam hangat,<br>Panitia Seleksi Calon Peserta Magang BPS Provinsi Banten</p>
     </div>
 </body>
 </html>

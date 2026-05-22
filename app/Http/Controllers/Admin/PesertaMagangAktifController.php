@@ -91,4 +91,31 @@ class PesertaMagangAktifController extends Controller
 
         return redirect()->route('admin.peserta_magang_aktif.index')->with('success', 'Berhasil menghapus data pengajuan magang.');
     }
+
+    public function laporanPresensi(Request $request, $id)
+    {
+        $magang = PengajuanMagang::with('user')->findOrFail($id);
+        $user = $magang->user;
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'Akun pengguna untuk peserta ini tidak ditemukan.');
+        }
+
+        $bulan = $request->get('bulan', date('m'));
+        $tahun = $request->get('tahun', date('Y'));
+        $tanggal = $request->get('tanggal');
+
+        $query = \App\Models\Presensi::where('user_id', $user->id)
+            ->whereYear('tanggal', $tahun);
+
+        if ($tanggal) {
+            $query->where('tanggal', $tanggal);
+        } else {
+            $query->whereMonth('tanggal', $bulan);
+        }
+
+        $presensis = $query->orderBy('tanggal', 'asc')->get();
+
+        return view('admin.peserta_magang_aktif.laporan_presensi', compact('magang', 'user', 'presensis', 'bulan', 'tahun', 'tanggal'));
+    }
 }

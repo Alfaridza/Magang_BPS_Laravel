@@ -248,8 +248,8 @@
 
         {{-- Title --}}
         <div class="title-block">
-            <h1>PRESMA Mobile BPS</h1>
-            <p>Presensi Magang BPS Provinsi Banten</p>
+            <h1>SIGMA BANTEN</h1>
+            <p>Fasilitas Presensi Magang Secara Digital</p>
         </div>
 
         {{-- Alerts --}}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PengajuanMagang;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class PesertaController extends Controller
 {
@@ -22,53 +23,11 @@ class PesertaController extends Controller
     public function profil()
     {
         $user = Auth::user();
-        return view('peserta.profil', compact('user'));
+        $pengajuan = PengajuanMagang::where('user_id', $user->id)->latest()->first();
+        return view('peserta.profil', compact('user', 'pengajuan'));
     }
 
-    public function cekPresensi()
-    {
-        $user = Auth::user();
-        
-        $isProfileComplete = !empty($user->jenis_kelamin) && 
-                           !empty($user->tanggal_lahir) && 
-                           !empty($user->tempat_lahir) && 
-                           !empty($user->no_hp) && 
-                           !empty($user->alamat);
-                           
-        $pengajuan = PengajuanMagang::where('user_id', $user->id)
-                        ->latest()
-                        ->first();
-        $isApplicationApproved = $pengajuan && $pengajuan->status_pengajuan === 'Diterima';
 
-        if (!$isProfileComplete || !$isApplicationApproved) {
-            return view('peserta.presensi_alert', compact('user', 'isProfileComplete', 'isApplicationApproved', 'pengajuan'));
-        }
-
-        return redirect()->route('presensi.login');
-    }
-
-    public function presensi()
-    {
-        // Ambil user dari session presensi (bukan dari sesi web utama)
-        $userId = session('presensi_user_id');
-        $user   = \App\Models\User::findOrFail($userId);
-        
-        // Check if user profile is complete
-        $isProfileComplete = !empty($user->jenis_kelamin) && 
-                           !empty($user->tanggal_lahir) && 
-                           !empty($user->tempat_lahir) && 
-                           !empty($user->no_hp) && 
-                           !empty($user->alamat);
-                           
-        // Check if user has an approved application
-        $pengajuan = PengajuanMagang::where('user_id', $user->id)
-                        ->where('status_pengajuan', 'Diterima')
-                        ->latest()
-                        ->first();
-        $isApplicationApproved = !is_null($pengajuan);
-
-        return view('peserta.presensi', compact('user', 'isProfileComplete', 'isApplicationApproved', 'pengajuan'));
-    }
 
     public function updateProfil(Request $request)
     {
@@ -86,5 +45,32 @@ class PesertaController extends Controller
         $user->update($validatedData);
 
         return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return redirect()->back()->withErrors([
+                'current_password' => 'Password saat ini salah.',
+            ])->with('show_password_form', true);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->back()->with('password_success', 'Password berhasil diubah!');
     }
 }

@@ -57,4 +57,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(PengajuanMagang::class);
     }
+
+    public function pengajuanMagang()
+    {
+        return $this->hasOne(PengajuanMagang::class)->latest();
+    }
+
+    public function presensis()
+    {
+        return $this->hasMany(Presensi::class);
+    }
 }

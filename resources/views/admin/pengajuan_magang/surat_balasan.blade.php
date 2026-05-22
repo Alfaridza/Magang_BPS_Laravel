@@ -125,7 +125,7 @@
     <?php if($pengajuan->status_pengajuan == 'Diterima'): ?>
         <p style="text-align: justify;">
             Bersama ini disampaikan pada prinsipnya kami mahasiswa tersebut <b>Diterima</b> 
-            untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik
+            untuk melaksanakan  Kerja Praktik /  Magang / Praktik Kerja Lapangan (PkL) di Badan Pusat Statistik
             Provinsi Banten mulai tanggal <?= date('d F Y', strtotime($pengajuan->periode_mulai)) ?> s.d <?= date('d F Y', strtotime($pengajuan->periode_selesai)) ?>.
         </p>
     <?php else: ?>

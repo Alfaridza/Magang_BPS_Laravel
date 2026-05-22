@@ -72,8 +72,8 @@
                 <div class="flex items-center gap-3">
                     <img src="{{ asset('assets/img/logo.png') }}" class="h-10 w-auto bg-white rounded-full p-1 shadow-md">
                     <div class="text-white font-bold leading-tight hidden md:block">
-                        <span class="block text-sm text-gray-200">WEBSITE PENDAFTARAN MAGANG & PKL</span>
-                        <span class="block text-lg tracking-wide font-extrabold text-white">BPS PROVINSI BANTEN</span>
+                        <span class="block text-xl tracking-wide font-extrabold text-white">SIGMA BANTEN</span>
+                        <span class="block text-xs text-gray-200 font-normal"> Sistem Informasi Magang BPS Provinsi Banten</span>
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
@@ -114,8 +114,8 @@
                 </span>
             </div>
             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl">
-                Mencetak Talenta Data, <br>
-                Hadirkan <span class="text-transparent bg-clip-text bg-gradient-to-r from-bps-accent to-yellow-200">Insight untuk Negeri</span>
+                Meningkatkan Pemahaman Data <br>
+                Menghadirkan <span class="text-transparent bg-clip-text bg-gradient-to-r from-bps-accent to-yellow-200">Insight untuk Negeri</span>
             </h1>
             <p class="text-gray-100 text-lg md:text-xl mb-10 max-w-3xl mx-auto font-light leading-relaxed">
                 Bergabunglah dengan Badan Pusat Statistik Provinsi Banten. 

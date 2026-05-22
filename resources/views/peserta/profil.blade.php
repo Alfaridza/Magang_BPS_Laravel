@@ -78,6 +78,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Informasi Pendidikan (Read-Only dari Pengajuan Magang) -->
+            <div class="mt-8">
+                <h3 class="text-lg font-bold text-gray-800 border-b border-gray-100 pb-3 mb-5">Informasi Pendidikan <span class="text-xs font-normal text-gray-400 ml-2"></span></h3>
+                @if($pengajuan)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold mb-1">NIM</p>
+                            <p class="text-gray-800 font-medium"><i class="fas fa-id-card text-blue-400 mr-2 w-4 text-center"></i> {{ $pengajuan->nim_nisn ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold mb-1">Instansi</p>
+                            <p class="text-gray-800 font-medium"><i class="fas fa-university text-blue-400 mr-2 w-4 text-center"></i> {{ $pengajuan->nama_sekolah ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold mb-1">Fakultas</p>
+                            <p class="text-gray-800 font-medium"><i class="fas fa-building text-blue-400 mr-2 w-4 text-center"></i> {{ $pengajuan->fakultas ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold mb-1">Jurusan</p>
+                            <p class="text-gray-800 font-medium"><i class="fas fa-graduation-cap text-blue-400 mr-2 w-4 text-center"></i> {{ $pengajuan->jurusan ?? '-' }}</p>
+                        </div>
+                    </div>
+                @else
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
+                        <i class="fas fa-info-circle text-blue-300 text-3xl mb-3"></i>
+                        <p class="text-blue-700 font-medium">Data pendidikan akan otomatis terisi setelah Anda mengajukan magang.</p>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -106,9 +136,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kelamin</label>
-                        <select name="jenis_kelamin" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm appearance-none">
-                            <option value="" disabled selected>Pilih jenis kelamin...</option>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kelamin </label>
+                        <select name="jenis_kelamin" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm"placeholder= "Jenis Kelamin">
+                            <option value="" disabled selected> Jenis Kelamin</option>
                             <option value="L" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'L' ? 'selected' : '' }}>Laki-laki</option>
                             <option value="P" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'P' ? 'selected' : '' }}>Perempuan</option>
                         </select>
@@ -147,6 +177,95 @@
         </div>
     </div>
 
+    <!-- Section Ubah Password -->
+    <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-8 py-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center cursor-pointer" onclick="togglePasswordForm()">
+            <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                <i class="fas fa-key text-amber-500 mr-3"></i> Ubah Password
+            </h3>
+            <button type="button" id="toggle-password-icon" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex justify-center items-center text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-chevron-down text-xs" id="password-chevron"></i>
+            </button>
+        </div>
+        
+        <div id="password-form-section" class="{{ session('show_password_form') || session('password_success') || $errors->has('current_password') || $errors->has('password') ? 'block' : 'hidden' }}">
+            <div class="p-8">
+                @if(session('password_success'))
+                    <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center shadow-sm">
+                        <i class="fas fa-check-circle mr-3 text-xl"></i>
+                        {{ session('password_success') }}
+                    </div>
+                @endif
+
+                @if ($errors->has('current_password') || $errors->has('password'))
+                    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 shadow-sm">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-exclamation-circle mr-2 text-lg"></i>
+                            <span class="font-bold">Gagal mengubah password:</span>
+                        </div>
+                        <ul class="list-disc list-inside text-sm ml-6">
+                            @if($errors->has('current_password'))
+                                <li>{{ $errors->first('current_password') }}</li>
+                            @endif
+                            @if($errors->has('password'))
+                                <li>{{ $errors->first('password') }}</li>
+                            @endif
+                        </ul>
+                    </div>
+                @endif
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-amber-500 mr-3 mt-0.5"></i>
+                        <p class="text-sm text-amber-700">Password harus minimal 6 karakter. Pastikan Anda mengingat password baru Anda.</p>
+                    </div>
+                </div>
+
+                <form action="{{ route('peserta.profil.password') }}" method="POST">
+                    @csrf
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Password Saat Ini</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" name="current_password" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm" placeholder="Masukkan password saat ini">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Password Baru</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                                        <i class="fas fa-key"></i>
+                                    </span>
+                                    <input type="password" name="password" minlength="6" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm" placeholder="Min. 6 karakter">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Password Baru</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                                        <i class="fas fa-check-double"></i>
+                                    </span>
+                                    <input type="password" name="password_confirmation" minlength="6" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white shadow-sm" placeholder="Ulangi password baru">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4 border-t border-gray-100">
+                            <button type="submit" class="bg-amber-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-amber-600 transition transform hover:-translate-y-0.5 shadow-lg shadow-amber-500/30 flex items-center">
+                                <i class="fas fa-save mr-2"></i> Ubah Password
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -166,5 +285,32 @@
             editDiv.classList.add('block');
         }
     }
+
+    function togglePasswordForm() {
+        const section = document.getElementById('password-form-section');
+        const chevron = document.getElementById('password-chevron');
+        
+        if (section.classList.contains('hidden')) {
+            section.classList.remove('hidden');
+            section.classList.add('block');
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        } else {
+            section.classList.add('hidden');
+            section.classList.remove('block');
+            chevron.classList.remove('fa-chevron-up');
+            chevron.classList.add('fa-chevron-down');
+        }
+    }
+
+    // Auto-rotate chevron if password form is visible on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const section = document.getElementById('password-form-section');
+        const chevron = document.getElementById('password-chevron');
+        if (!section.classList.contains('hidden')) {
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        }
+    });
 </script>
 @endsection
